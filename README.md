@@ -1,14 +1,29 @@
 # ex-form-v2
 
-## Project setup
+## npm 安装
 ```
-npm install
+npm i element-ui ex-form-v2 -S
 ```
 
-### Compiles and hot-reloads for development
+## 引入
+```js
+import Vue from 'vue';
+import ElementUI from 'element-ui';
+import App from './App.vue';
+import 'element-ui/lib/theme-chalk/index.css';
+import ExFormV2 from './lib/index';
+
+Vue.config.productionTip = false;
+Vue.use(ElementUI);
+Vue.use(ExFormV2);
+
+new Vue({
+  render: (h) => h(App),
+}).$mount('#app');
+
 ```
-npm run serve
-```
+
+## demo
 
 ```vue
 <template>
@@ -17,7 +32,7 @@ npm run serve
     <ex-form :form-config="formConfig" @submit="handleSubmit" />
 
     <!-- $showDialogForm方法示例 -->
-    <el-button size="mini" type="primary" @click="openDialogForm">打开弹窗表单</el-button>
+    <el-button @click="openDialogForm">打开弹窗表单</el-button>
   </div>
 </template>
 
@@ -26,16 +41,20 @@ export default {
   name: 'App',
   data() {
     return {
+      // 弹窗属性
       dialogAttrs: {
         title: '活动申请表',
         width: '450px',
         top: '10vh',
         center: false,
       },
+      // 表单配置
       formConfig: {
+        // 表单属性
         formAttrs: {
           labelWidth: '80px',
         },
+        // 表单元素
         formItems: {
           name: { label: '活动名称', component: 'el-input' },
           region: {
@@ -44,9 +63,7 @@ export default {
             style: { width: '100%' },
             options: [{ value: 'A', label: '区域A' }, { value: 'B', label: '区域B' }],
           },
-          date: {
-            label: '活动时间', component: 'el-date-picker', type: 'date', placeholder: '选择日期',
-          },
+          date: { label: '活动时间', component: 'el-date-picker', type: 'date', placeholder: '选择日期' },
           delivery: { label: '即时配送', component: 'el-switch' },
           type: { label: '活动性质', component: 'el-checkbox-group', options: [] },
           resource: {
@@ -57,6 +74,7 @@ export default {
           desc: { label: '活动形式', component: 'el-input', type: 'textarea' },
 
         },
+        // 表单初始値
         formData: {
           name: '',
           region: '',
@@ -66,23 +84,19 @@ export default {
           resource: '',
           desc: '',
         },
+        // 表单规则
         rules: {
           name: [
             { required: true, message: '请输入活动名称', trigger: 'blur' },
-            {
-              min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur',
-            },
+            { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' },
           ],
           region: { required: true, message: '请选择活动区域', trigger: 'change' },
-          date: {
-            type: 'date', required: true, message: '请选择日期', trigger: 'change',
-          },
-          type: {
-            type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change',
-          },
+          date: { type: 'date', required: true, message: '请选择日期', trigger: 'change' },
+          type: { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' },
           resource: { required: true, message: '请选择活动资源', trigger: 'change' },
           desc: { required: false, message: '请填写活动形式', trigger: 'blur' },
         },
+        // 表单元素事件
         events: {
           deliveryChange(formData, formItems, rules) {
             formData.desc = formData.delivery ? '即时配送' : '';
@@ -90,11 +104,18 @@ export default {
             rules.desc.required = !!formData.delivery;
           },
         },
+        // 打开表单前的钩子
         beforeOpen(formData, formItems, rules) {
-          formItems.type.options = [{ label: '美食/餐厅线上活动' }, { label: '地推活动' }, { label: '线下主题活动' }, { label: '单纯品牌曝光' }];
+          formItems.type.options = [
+            { label: '美食/餐厅线上活动' }, 
+            { label: '地推活动' }, 
+            { label: '线下主题活动' }, 
+            { label: '单纯品牌曝光' }
+          ];
           rules.type.required = true;
           formData.type = ['地推活动'];
         },
+        // 提交之前的钩子
         beforeSubmit(formData) {
           formData.desc += '!!!';
         },
@@ -107,7 +128,11 @@ export default {
     },
 
     openDialogForm() {
-      this.$showDialogForm({ dialogAttrs: this.dialogAttrs, formConfig: this.formConfig }).then((formData) => {
+      const dialogFormConfig = { 
+        dialogAttrs: this.dialogAttrs, 
+        formConfig: this.formConfig 
+      }
+      this.$showDialogForm(dialogFormConfig).then((formData) => {
         console.log(formData);
       });
     },
