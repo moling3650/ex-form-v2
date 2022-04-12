@@ -9,9 +9,9 @@ npm i element-ui ex-form-v2 -S
 ```js
 import Vue from 'vue';
 import ElementUI from 'element-ui';
+import ExFormV2 from 'ex-form-v2';
 import App from './App.vue';
 import 'element-ui/lib/theme-chalk/index.css';
-import ExFormV2 from './lib/index';
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
@@ -110,7 +110,7 @@ export default {
             { label: '美食/餐厅线上活动' }, 
             { label: '地推活动' }, 
             { label: '线下主题活动' }, 
-            { label: '单纯品牌曝光' }
+            { label: '单纯品牌曝光' },
           ];
           rules.type.required = true;
           formData.type = ['地推活动'];
@@ -130,8 +130,8 @@ export default {
     openDialogForm() {
       const dialogFormConfig = { 
         dialogAttrs: this.dialogAttrs, 
-        formConfig: this.formConfig 
-      }
+        formConfig: this.formConfig,
+      };
       this.$showDialogForm(dialogFormConfig).then((formData) => {
         console.log(formData);
       });
