@@ -1,14 +1,17 @@
 {
   "name": "ex-form-v2",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "private": false,
+  "main": "lib/ex-form-v2.umd.min.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:ex-form-v2": "vue-cli-service build --target lib --dest lib src/lib/index.js"
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "element-ui": "^2.15.6",
     "vue": "^2.6.14"
   },
   "devDependencies": {
