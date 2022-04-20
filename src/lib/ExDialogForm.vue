@@ -28,9 +28,9 @@ export default {
     };
   },
   methods: {
-    open(config, callback) {
-      this.formConfig = config.formConfig;
-      this.dialogAttrs = { ...defaultDialogAttrs, ...config.dialogAttrs };
+    async open({ dialogAttrs, formConfig }, callback) {
+      this.dialogAttrs = { ...defaultDialogAttrs, ...dialogAttrs };
+      this.formConfig = formConfig;
       this.callback = callback;
       this.visible = true;
     },
@@ -46,3 +46,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#DialogForm > .el-dialog__wrapper {
+  overflow: hidden;
+}
+</style>

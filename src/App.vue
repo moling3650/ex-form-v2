@@ -8,6 +8,18 @@
 </template>
 
 <script>
+function getOpts(key, ms = 500) {
+  const optDict = {
+    type: [{ label: '美食/餐厅线上活动' }, { label: '地推活动' }, { label: '线下主题活动' }, { label: '单纯品牌曝光' }],
+    region: [{ value: 'A', label: '区域A' }, { value: 'B', label: '区域B' }],
+  };
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(optDict[key]);
+    }, ms);
+  });
+}
+
 export default {
   name: 'App',
   data() {
@@ -28,7 +40,7 @@ export default {
             label: '活动区域',
             component: 'el-select',
             style: { width: '100%' },
-            options: [{ value: 'A', label: '区域A' }, { value: 'B', label: '区域B' }],
+            options: [{ value: 'A', label: '区域A' }],
           },
           date: {
             label: '活动时间', component: 'el-date-picker', type: 'date', placeholder: '选择日期',
@@ -70,16 +82,20 @@ export default {
           desc: { required: false, message: '请填写活动形式', trigger: 'blur' },
         },
         events: {
-          deliveryChange(formData, formItems, rules) {
+          async deliveryChange(formData, formItems, rules) {
             formData.desc = formData.delivery ? '即时配送' : '';
             formItems.desc.disabled = !!formData.delivery;
             rules.desc.required = !!formData.delivery;
+            formItems.region.options = await getOpts('region');
+            formData.region = '';
           },
         },
-        beforeOpen(formData, formItems, rules) {
-          formItems.type.options = [{ label: '美食/餐厅线上活动' }, { label: '地推活动' }, { label: '线下主题活动' }, { label: '单纯品牌曝光' }];
+        async beforeOpen(formData, formItems, rules) {
+          formItems.type.options = await getOpts('type', 1);
           rules.type.required = true;
           formData.type = ['地推活动'];
+          formItems.region.options = await getOpts('region');
+          formData.region = '';
         },
         beforeSubmit(formData) {
           formData.desc += '!!!';

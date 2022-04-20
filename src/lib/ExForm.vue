@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="FormRef" v-if="ready" :model="form" :rules="rules" v-bind="formAttrs">
+  <el-form ref="FormRef" v-if="ready" v-loading="loading" :model="form" :rules="rules" v-bind="formAttrs">
     <el-row :gutter="20">
       <el-col v-for="item in formItems" :key="item.prop" :span="item.span">
         <el-form-item :label="item.label" :prop="item.prop">
@@ -42,13 +42,14 @@ export default {
   data() {
     return {
       ready: false,
+      loading: false,
       formAttrs: {},
       formItems: {},
       form: {},
       rules: {},
     };
   },
-  mounted() {
+  created() {
     this.initForm();
   },
   methods: {
@@ -63,11 +64,21 @@ export default {
         if (!eventMap[prop]) {
           eventMap[prop] = {};
         }
-        eventMap[prop][eventName.toLowerCase()] = () => handler(this.form, this.formItems, this.rules);
+        eventMap[prop][eventName.toLowerCase()] = async () => {
+          this.loading = true;
+          const formData = await handler(this.form, this.formItems, this.rules);
+          this.loading = false;
+          if (formData) {
+            this.form = formData;
+          }
+        };
       });
       return eventMap;
     },
-    initForm() {
+    async initForm() {
+      if (this.ready) {
+        return;
+      }
       const eventMap = this.createEventMap(this.formConfig.events);
       this.formAttrs = { ...defaultFormAttrs, ...this.formConfig.formAttrs };
       this.rules = this.formConfig.rules;
@@ -100,23 +111,25 @@ export default {
           listeners: eventMap[prop] || {},
         };
       });
-      this.resetForm();
+      await this.resetForm();
       this.ready = true;
     },
-    resetForm() {
+    async resetForm() {
       if (this.$refs.FormRef) {
         this.$refs.FormRef.resetFields();
       }
 
       this.form = this.clone(this.formConfig.formData || {});
       if (typeof this.formConfig.beforeOpen === 'function') {
-        this.formConfig.beforeOpen(this.form, this.formItems, this.rules);
+        await this.formConfig.beforeOpen(this.form, this.formItems, this.rules);
       }
-      Object.entries(this.formConfig.events).forEach(([key, handler]) => {
-        if (key.endsWith('Change')) {
-          handler(this.form, this.formItems, this.rules);
-        }
-      });
+      if (this.ready) {
+        Object.entries(this.formConfig.events).forEach(([key, handler]) => {
+          if (key.endsWith('Change')) {
+            handler(this.form, this.formItems, this.rules);
+          }
+        });
+      }
     },
     submitForm() {
       this.$refs.FormRef.validate((valid) => {
